@@ -4,26 +4,7 @@ import System.IO
 cards = [1..13]
 
 -- deck of cards
-decks :: (Eq t, Num t) => t -> [Int]
-decks 0 = []
-decks n = cards ++ cards ++ cards ++ cards ++ decks (n-1)
-
--- returns name of card
-cardName :: (Eq a, Num a) => a -> [Char]
-cardName 1 = "ACE"
-cardName 2 = "TWO"
-cardName 3 = "THREE"
-cardName 4 = "FOUR"
-cardName 5 = "FIVE"
-cardName 6 = "SIX"
-cardName 7 = "SEVEN"
-cardName 8 = "EIGHT"
-cardName 9 = "NINE"
-cardName 10 = "TEN"
-cardName 11 = "JACK"
-cardName 12 = "QUEEN"
-cardName 13 = "KING"
-
+decks = cards ++ cards ++ cards ++ cards
 
 -- returns value of card
 cardValue :: (Eq a, Num a, Enum a) => a -> a
@@ -50,13 +31,51 @@ highlow (State currentCard nextCard choice playerFunds bet currDeck)
 	| lose currentCard nextCard choice = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
 	| win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) 0 currDeck)
 
+
+-- draw card to keep track of current card and perhaps nextCard??
+drawCard :: State -> IO State
+
+
+
+-- playersTurn
+playersTurn :: State -> IO State
+
+
+
 -- tie if currentCard and nextCard are equal
+tie currentCard nextCard choice = 
+    if (cardValue currentCard) == (cardValue nextCard)
+        then True
+        else False
 
 -- lose if choice is low and currentCard is lower than nextCard
 -- lose if choice is high and currentCard is higher than nextCard
 
+lose currentCard nextCard choice = 
+    if choice == "low"
+        then if (cardValue currentCard) < (cardValue nextCard)
+            then True
+            else False
+    if choice == "high"
+        then if (cardValue currentCard) > (cardValue nextCard)
+            then True
+            else False
+
 -- win if choice is low and currentCard is higher than nextCard
--- lose if choice is high and currentCard is lower than nextCard
+-- win if choice is high and currentCard is lower than nextCard
+
+win currentCard nextCard choice = 
+    if choice == "low"
+        then if (cardValue currentCard) > (cardValue nextCard)
+            then True
+            else False
+    if choice == "high"
+        then if (cardValue currentCard) < (cardValue nextCard)
+            then True
+            else False
+
+
+
 
 -- to run program: play
 main = do
