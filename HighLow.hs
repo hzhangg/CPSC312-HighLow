@@ -36,19 +36,18 @@ cardValue n
 data Result = EndOfGame Int State
     deriving (Eq, Show)
 
--- a state is a state where currentCard nextCard choice playerfunds bet [remaining cards in deck]
-data State = State Int Int String Double Double Double [Int] 
+-- a state is a state where currentCard nextCard savedChoice playerfunds bet [remaining cards in deck]
+data State = State Int Int String Double Double [Int] 
     deriving (Ord, Eq, Show)
 
 -- a highlow game takes a state (current hand), returns result tie, win or lose
 type Game = State -> Result
 
-highlow :: State -> Result
-highlow (State currentCard nextCard choice playerFunds bet currDeck) 
-    | tie currentCard nextCard choice = EndOfGame 0 (State currentCard nextCard  choice (playerfunds + bet) 0 currDeck)
+highlow :: State -> String -> Result
+highlow (State currentCard nextCard savedChoice playerfunds bet currDeck) choice
+    | tie currentCard nextCard choice = EndOfGame 0 (State currentCard nextCard choice (playerfunds + bet) 0 currDeck)
     | lose currentCard nextCard choice = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
     | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) 0 currDeck)
-    | otherwise = ContinueGame (State currentCard nextCard choice playerfunds 0 currDeck)
 
 -- tie if currentCard and nextCard are equal
 tie currentCard nextCard choice = 
@@ -80,42 +79,88 @@ win currentCard nextCard choice
 
 -- draw card to keep track of current card and perhaps nextCard??
 drawCard :: State -> IO State
-drawCard (State currentCard nextCard choice playerFunds bet []) = drawCard (State currentCard nextCard choice playerFunds bet (createDeck))
+drawCard (State currentCard nextCard savedChoice playerFunds bet []) = drawCard (State currentCard nextCard savedChoice playerFunds bet (createDeck))
 
-drawCard (State currentCard nextCard choice playerFunds bet (f:r)) 
-    | nextCard == 0 = drawCard (State currentCard f choice playerFunds bet r)
-    | otherwise = return (State nextCard f choice playerFunds bet r)
+drawCard (State currentCard nextCard savedChoice playerFunds bet (f:r)) 
+    | nextCard == 0 = drawCard (State currentCard f savedChoice playerFunds bet r)
+    | otherwise = return (State nextCard f savedChoice playerFunds bet r)
 
+createDeck = decks
 
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
     putStrLn "High or Low?"
     ans <- getLineCorr
-    putStrLn "Got here"
-    newState <- highlow 
-    playersTurn
+    if ans == "High" 
+        then do
+            result(highlow p "High")
+    else if ans == "Low"
+        then do
+             result(highlow p "Low")
+    else do
+            putStrLn "Invalid input. Please try again."
+            putStrLn "Enter 'High' or 'Low'"
+            playersTurn p
 
 
 
 
 -- to run program: play
 main = do
-    play (State 0 0 "" 0 0 0 [])
+    play (State 0 0 "" 0 0 [])
 
 play :: State -> IO State
 play s = do
-    putStrLn "Would you like to play HighLow?"
+    putStrLn (show "Would you like to play HighLow?")
     ans <- getLineCorr
     if ans `elem` ["y", "yes"] 
         then do 
-                a <- drawCard (State 0 0 "" 0 0 0 [])
+                a <- drawCard (State 0 0 "" 0 0 [])
                 playersTurn a
     else if ans `elem` ["n","no"]
         then do 
             putStrLn "Thank you for visiting."
-            return (State 0 0 "" 0 0 0 [])
+            return (State 0 0 "" 0 0 [])
         else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'y' or 'yes' for YES and 'n' or 'no' for NO."
             play s
+
+-- show player's card
+getCurrentCard (State currentCard nextCard savedChoice playerfunds bet currDeck) = currentCard
+
+-- show next card
+getNextCard (State currentCard nextCard savedChoice playerfunds bet currDeck) = nextCard
+
+-- show choice
+getChoice (State currentCard nextCard savedChoice playerfunds bet currDeck) = nextCard
+
+-- show playerfunds
+getFunds (State currentCard nextCard savedChoice playerfunds bet currDeck) = playerfunds
+
+result :: Result -> IO State
+result (EndOfGame 0 s) = do
+    putStrLn ""
+    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
+    putStrLn $ "-------------TIE-------------" ++ "\n"
+    putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
+    return s
+result (EndOfGame 1 s) = do
+    putStrLn ""
+    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
+    putStrLn $ "-------------LOSE-------------" ++ "\n"
+    putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
+    return s
+result (EndOfGame 2 s) = do
+    putStrLn ""
+    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
+    putStrLn $ "-------------WIN-------------" ++ "\n"
+    putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
+    return s
