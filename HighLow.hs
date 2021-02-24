@@ -41,13 +41,14 @@ data State = State Int Int String Double Double [Int]
     deriving (Ord, Eq, Show)
 
 -- a highlow game takes a state (current hand), returns result tie, win or lose
-type Game = State -> Result
+type Game = State -> State
 
 highlow :: State -> String -> Result
 highlow (State currentCard nextCard savedChoice playerfunds bet currDeck) choice
     | tie currentCard nextCard choice = EndOfGame 0 (State currentCard nextCard choice (playerfunds + bet) 0 currDeck)
     | lose currentCard nextCard choice = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
     | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) 0 currDeck)
+    | otherwise = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
 
 -- tie if currentCard and nextCard are equal
 tie currentCard nextCard choice = 
@@ -65,6 +66,7 @@ lose currentCard nextCard choice
     | choice == "high" = if (cardValue currentCard) > (cardValue nextCard)
         then True
         else False
+    | otherwise = False
 
 -- win if choice is low and currentCard is higher than nextCard
 -- win if choice is high and currentCard is lower than nextCard
@@ -76,6 +78,7 @@ win currentCard nextCard choice
     | choice == "high" = if (cardValue currentCard) < (cardValue nextCard)
         then True
         else False
+    | otherwise = False
 
 -- draw card to keep track of current card and perhaps nextCard??
 drawCard :: State -> IO State
@@ -90,14 +93,17 @@ createDeck = decks
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
+    putStrLn $ "Your Card: " ++ show (getCurrentCard p) ++ "\n"
     putStrLn "High or Low?"
     ans <- getLineCorr
-    if ans == "High" 
+    if ans `elem` ["high", "High"] 
         then do
             result(highlow p "High")
-    else if ans == "Low"
+            play p
+    else if ans `elem` ["low", "Low"] 
         then do
              result(highlow p "Low")
+             play p
     else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'High' or 'Low'"
@@ -106,13 +112,13 @@ playersTurn p = do
 
 
 
--- to run program: play
+-- to run program: main
 main = do
     play (State 0 0 "" 0 0 [])
 
 play :: State -> IO State
 play s = do
-    putStrLn (show "Would you like to play HighLow?")
+    putStrLn "Would you like to play HighLow?"
     ans <- getLineCorr
     if ans `elem` ["y", "yes"] 
         then do 
@@ -134,7 +140,7 @@ getCurrentCard (State currentCard nextCard savedChoice playerfunds bet currDeck)
 getNextCard (State currentCard nextCard savedChoice playerfunds bet currDeck) = nextCard
 
 -- show choice
-getChoice (State currentCard nextCard savedChoice playerfunds bet currDeck) = nextCard
+getChoice (State currentCard nextCard savedChoice playerfunds bet currDeck) = savedChoice
 
 -- show playerfunds
 getFunds (State currentCard nextCard savedChoice playerfunds bet currDeck) = playerfunds
