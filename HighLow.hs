@@ -54,9 +54,7 @@ highlow (State currentCard nextCard savedChoice playerfunds bet currDeck) choice
 
 -- tie if currentCard and nextCard are equal
 tie currentCard nextCard choice = 
-    if (cardValue currentCard) == (cardValue nextCard)
-        then True
-        else False
+    (cardValue currentCard) == (cardValue nextCard)
 
 -- lose if choice is low and currentCard is lower than nextCard
 -- lose if choice is high and currentCard is higher than nextCard
@@ -92,12 +90,12 @@ playersTurn p = do
     ans <- getLineCorr
     if ans `elem` ["high", "High"] 
         then do
-            result(highlow p "High")
+            result (highlow p "High")
             play p
     else if ans `elem` ["low", "Low"] 
         then do
-             result(highlow p "Low")
-             play p
+            result(highlow p "Low")
+            play p
     else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'High' or 'Low'"
@@ -134,12 +132,12 @@ play s = do
     ans <- getLineCorr
     if ans `elem` ["y", "yes"] 
         then do 
-                a <- drawCard (State 0 0 "" 0 0 [])
-                playersTurn a
+            a <- drawCard (State 0 0 "" 0 0 [])
+            playersTurn a
     else if ans `elem` ["n","no"]
         then do 
             putStrLn "Thank you for visiting."
-            return (State 0 0 "" 0 0 [])
+            --return (State 0 0 "" 0 0 [])
         else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'y' or 'yes' for YES and 'n' or 'no' for NO."
