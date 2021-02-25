@@ -60,16 +60,16 @@ tie currentCard nextCard choice =
 -- lose if choice is high and currentCard is higher than nextCard
 
 lose currentCard nextCard choice
-    | choice == "low" = (cardValue currentCard) < (cardValue nextCard)
-    | choice == "high" = (cardValue currentCard) > (cardValue nextCard)
+    | choice == "Low" = (cardValue currentCard) < (cardValue nextCard)
+    | choice == "High" = (cardValue currentCard) > (cardValue nextCard)
     | otherwise = False
 
 -- win if choice is low and currentCard is higher than nextCard
 -- win if choice is high and currentCard is lower than nextCard
 
 win currentCard nextCard choice 
-    | choice == "low" = (cardValue currentCard) > (cardValue nextCard)
-    | choice == "high" = (cardValue currentCard) < (cardValue nextCard)
+    | choice == "Low" = (cardValue currentCard) > (cardValue nextCard)
+    | choice == "High" = (cardValue currentCard) < (cardValue nextCard)
     | otherwise = False
 
 -- draw card to keep track of current card and perhaps nextCard??
@@ -124,7 +124,10 @@ shuffle xs = do
 
 -- to run program: main
 main = do
-    play (State 0 0 "" 0 0 [])
+    play initState
+
+--initial State with $1000 (arbitrary default amount of money)
+initState = State 0 0 "" 1000 0 []
 
 play :: State -> IO State
 play s = do
@@ -132,12 +135,12 @@ play s = do
     ans <- getLineCorr
     if ans `elem` ["y", "yes"] 
         then do 
-            a <- drawCard (State 0 0 "" 0 0 [])
+            a <- drawCard s
             playersTurn a
     else if ans `elem` ["n","no"]
         then do 
             putStrLn "Thank you for visiting."
-            return (State 0 0 "" 0 0 [])
+            return s
         else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'y' or 'yes' for YES and 'n' or 'no' for NO."
