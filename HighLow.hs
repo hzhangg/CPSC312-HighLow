@@ -1,6 +1,8 @@
 import System.IO
-
-
+import System.Random
+import Data.Array.IO
+import Control.Monad
+import System.IO.Unsafe 
 -- Taken from the TwentyOneQuestion assignment solution
 -- getLineCorr reads the line and returns the corrected line by removing deleted characters
 getLineCorr :: IO [Char]
@@ -37,7 +39,7 @@ data Result = EndOfGame Int State
     deriving (Eq, Show)
 
 -- a state is a state where currentCard nextCard savedChoice playerfunds bet [remaining cards in deck]
-data State = State Int Int String Double Double [Int] 
+data State = State Int Int String Double Double [Int]
     deriving (Ord, Eq, Show)
 
 -- a highlow game takes a state (current hand), returns result tie, win or lose
@@ -60,24 +62,16 @@ tie currentCard nextCard choice =
 -- lose if choice is high and currentCard is higher than nextCard
 
 lose currentCard nextCard choice
-    | choice == "low" = if (cardValue currentCard) < (cardValue nextCard)
-        then True
-        else False
-    | choice == "high" = if (cardValue currentCard) > (cardValue nextCard)
-        then True
-        else False
+    | choice == "low" = (cardValue currentCard) < (cardValue nextCard)
+    | choice == "high" = (cardValue currentCard) > (cardValue nextCard)
     | otherwise = False
 
 -- win if choice is low and currentCard is higher than nextCard
 -- win if choice is high and currentCard is lower than nextCard
 
 win currentCard nextCard choice 
-    | choice == "low" = if (cardValue currentCard) > (cardValue nextCard)
-        then True
-        else False
-    | choice == "high" = if (cardValue currentCard) < (cardValue nextCard)
-        then True
-        else False
+    | choice == "low" = (cardValue currentCard) > (cardValue nextCard)
+    | choice == "high" = (cardValue currentCard) < (cardValue nextCard)
     | otherwise = False
 
 -- draw card to keep track of current card and perhaps nextCard??
@@ -88,7 +82,7 @@ drawCard (State currentCard nextCard savedChoice playerFunds bet (f:r))
     | nextCard == 0 = drawCard (State currentCard f savedChoice playerFunds bet r)
     | otherwise = return (State nextCard f savedChoice playerFunds bet r)
 
-createDeck = decks
+createDeck = unsafePerformIO (shuffle decks)
 
 -- playersTurn
 playersTurn :: State -> IO State
@@ -110,6 +104,24 @@ playersTurn p = do
             playersTurn p
 
 
+-- Randomly shuffles deck of cards
+-- -- algorithm for shuffle taken from https://wiki.haskell.org/Random_shuffle
+-- -- | Randomly shuffle a list
+-- -- /O(N)/
+shuffle :: [a] -> IO [a]
+shuffle xs = do
+        ar <- newArray n xs
+        forM [1..n] $ \i -> do
+            j <- randomRIO (i,n)
+            vi <- readArray ar i
+            vj <- readArray ar j
+            writeArray ar j vi
+            return vj
+    
+    where
+      n = length xs
+      newArray :: Int -> [a] -> IO (IOArray Int a)
+      newArray n xs =  newListArray (1,n) xs
 
 
 -- to run program: main
