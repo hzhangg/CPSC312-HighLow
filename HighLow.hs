@@ -137,7 +137,7 @@ play s = do
     else if ans `elem` ["n","no"]
         then do 
             putStrLn "Thank you for visiting."
-            --return (State 0 0 "" 0 0 [])
+            return (State 0 0 "" 0 0 [])
         else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'y' or 'yes' for YES and 'n' or 'no' for NO."
