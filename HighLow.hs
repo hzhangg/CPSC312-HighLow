@@ -3,6 +3,12 @@ import System.Random
 import Data.Array.IO
 import Control.Monad
 import System.IO.Unsafe 
+{- If the random import gives you issues when compiling, try (on a new terminal):
+        stack import random
+        stack ghci
+   Then continue as normal
+-}
+
 -- Taken from the TwentyOneQuestion assignment solution
 -- getLineCorr reads the line and returns the corrected line by removing deleted characters
 getLineCorr :: IO [Char]
@@ -33,6 +39,21 @@ cardValue :: (Eq a, Num a, Enum a) => a -> a
 cardValue n
     | n `elem` [1..13] = n
     | otherwise = 0
+
+toCard n 
+    | n == 1 = "Ace (aces are ones!)" -- ++ randomSuit (mkStdGen 100)
+    | n == 11 = "Jack" -- ++ randomSuit (mkStdGen 100)
+    | n == 12 = "Queen" -- ++ randomSuit (mkStdGen 100)
+    | n == 13 = "King" -- ++ randomSuit (mkStdGen 100)
+    | otherwise = show n -- ++ randomSuit (mkStdGen 100)
+
+--possibly implement this later
+--generator for random numbers
+--gen = mkStdGen 3
+{-
+suits = ["Hearts", "Diamonds", "Spades", "Clubs"]
+randomSuit gen = " of " ++ show (suits !! fst (randomR (0, 3) gen))
+-}
 
 -- end of game: value (0 = tie, 1 = win, 2 = lose), starting next state
 data Result = EndOfGame Int State
@@ -85,7 +106,7 @@ createDeck = unsafePerformIO (shuffle decks)
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
-    putStrLn $ "Your Card: " ++ show (getCurrentCard p) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (toCard (getCurrentCard p)) ++ "\n"
     putStrLn "High or Low?"
     ans <- getLineCorr
     if ans `elem` ["high", "High"] 
@@ -196,24 +217,24 @@ getFunds (State currentCard nextCard savedChoice playerfunds bet currDeck) = pla
 result :: Result -> IO State
 result (EndOfGame 0 s) = do
     putStrLn ""
-    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
-    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (toCard (getCurrentCard s)) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------TIE-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
     return s
 result (EndOfGame 1 s) = do
     putStrLn ""
-    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
-    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (toCard (getCurrentCard s)) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------LOSE-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
     return s
 result (EndOfGame 2 s) = do
     putStrLn ""
-    putStrLn $ "Your Card: " ++ show (getCurrentCard s) ++ "\n"
-    putStrLn $ "Next Card: " ++ show (getNextCard s) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (toCard (getCurrentCard s)) ++ "\n"
+    putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------WIN-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ show (getFunds s) ++ "\n"
