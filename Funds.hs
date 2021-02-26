@@ -29,7 +29,7 @@ subChips cost chips =
     let newChips = (moneyToChips cost)
         budget = chipsToMoney chips
     in 
-        if (checkChips (<=) newChips chips) then funcChips (-) newChips chips 
+        if (checkChips (<=) newChips chips) then funcChips (-) chips newChips 
         else moneyToChips (budget - cost)
 
 -- Int [Chips] -> Bool
@@ -54,18 +54,20 @@ displayChips chips =
         putStrLn $ " ==========="
         putStrLn $ "|   CHIPS   |"
         putStrLn $ " ==========="
-        putStrLn $ "(Whites)  " ++ show (w) ++ " held = $" ++ show (white) ++ " x " ++ show (w) ++ " = $" ++ show (w * white) ++" "
-        putStrLn $ "(Reds)    " ++ show (r) ++ " held = $" ++ show (red) ++ " x " ++ show (r) ++ " = $" ++ show (r * red) ++" "
-        putStrLn $ "(Oranges) " ++ show (o) ++ " held = $" ++ show (orange) ++ " x " ++ show (o) ++ " = $" ++ show (o * orange) ++" "
-        putStrLn $ "(Yellows) " ++ show (y) ++ " held = $" ++ show (yellow) ++ " x " ++ show (y) ++ " = $" ++ show (y * yellow) ++" "
-        putStrLn $ "(Greens)  " ++ show (g) ++ " held = $" ++ show (green) ++ " x " ++ show (g) ++ " = $" ++ show (g * green) ++" "
-        putStrLn $ "(Blacks)  " ++ show (b) ++ " held = $" ++ show (black) ++ " x " ++ show (b) ++ " = $" ++ show (b * black) ++" "
-        putStrLn $ "(Purples) " ++ show (p) ++ " held = $" ++ show (purple) ++ " x " ++ show (p) ++ " = $" ++ show (p * purple) ++" "
-        putStrLn $ "(Maroons) " ++ show (m) ++ " held = $" ++ show (maroon) ++ " x " ++ show (m) ++ " = $" ++ show (m * maroon) ++" "
+        putStrLn $ "(Whites)  " ++ show (w) ++ " chips = $" ++ show (white) ++ " x " ++ show (w) ++ " = $" ++ show (w * white) ++" "
+        putStrLn $ "(Reds)    " ++ show (r) ++ " chips = $" ++ show (red) ++ " x " ++ show (r) ++ " = $" ++ show (r * red) ++" "
+        putStrLn $ "(Oranges) " ++ show (o) ++ " chips = $" ++ show (orange) ++ " x " ++ show (o) ++ " = $" ++ show (o * orange) ++" "
+        putStrLn $ "(Yellows) " ++ show (y) ++ " chips = $" ++ show (yellow) ++ " x " ++ show (y) ++ " = $" ++ show (y * yellow) ++" "
+        putStrLn $ "(Greens)  " ++ show (g) ++ " chips = $" ++ show (green) ++ " x " ++ show (g) ++ " = $" ++ show (g * green) ++" "
+        putStrLn $ "(Blacks)  " ++ show (b) ++ " chips = $" ++ show (black) ++ " x " ++ show (b) ++ " = $" ++ show (b * black) ++" "
+        putStrLn $ "(Purples) " ++ show (p) ++ " chips = $" ++ show (purple) ++ " x " ++ show (p) ++ " = $" ++ show (p * purple) ++" "
+        putStrLn $ "(Maroons) " ++ show (m) ++ " chips = $" ++ show (maroon) ++ " x " ++ show (m) ++ " = $" ++ show (m * maroon) ++" "
         putStrLn $ "_________________________________________________"
         putStrLn $ "<< Total >> = $" ++ show (chipsToMoney chips) ++ " "
 
-    
+-- [Chips] -> Int
+-- sums up the playerChips to get total value/budget
+chipsToMoney chips = sum (map chipVal chips)
 
 
 -- ============ --
@@ -80,7 +82,7 @@ data Chips = Whites Int
             | Blacks Int
             | Purples Int
             | Maroons Int
-       deriving (Show)
+       deriving (Ord, Eq, Show)
 
 -- chip values --
 white = 1
@@ -109,10 +111,6 @@ isGreen n = n == green
 isBlack n = n == black
 isPurple n = n == purple
 isMaroon n = n == maroon
-
--- [Chips] -> Int
--- sums up the playerChips to get total value/budget
-chipsToMoney chips = sum (map chipVal chips)
 
 -- Int -> [Chips] 
 -- converts a specified amount of money into Chips 

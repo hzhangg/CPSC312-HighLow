@@ -63,7 +63,7 @@ data Result = EndOfGame Int State Double
     deriving (Eq, Show)
 
 -- a state is a state where currentCard nextCard savedChoice playerfunds bet [remaining cards in deck] multiplier winnings
-data State = State Int Int String Double Double [Int] Double Double
+data State = State Int Int String [Chips] Double [Int] Double Double
     deriving (Ord, Eq, Show)
 
 -- a highlow game takes a state (current hand), returns result tie, win or lose
@@ -78,7 +78,7 @@ highlow (State currentCard nextCard savedChoice playerfunds bet currDeck mult wi
     | win currentCard nextCard choice = 
         let newMult = (mult * (m currentCard choice) )
         in EndOfGame 2 (State currentCard nextCard choice playerfunds bet currDeck newMult ( newMult * (winnings + bet))) winnings
-    | otherwise = EndOfGame 1 (State currentCard nextCard choice (playerfunds + winnings) bet currDeck mult winnings) winnings
+    | otherwise = EndOfGame 1 (State currentCard nextCard choice playerfunds bet currDeck mult winnings) winnings
 
 -- tie if currentCard and nextCard are equal
 tie currentCard nextCard choice = 
@@ -165,7 +165,7 @@ playersTurn p = do
 -- gets the users bet
 placeBet :: State -> IO State
 placeBet (State currentCard nextCard savedChoice playerFunds bet deck mult winnings) = do
-    putStrLn $ "You have $" ++ strRound(show playerFunds) ++ ""
+    putStrLn $ "You have $" ++ strRound(show (chipsToMoney playerFunds)) ++ ""
     putStrLn "How much would you like to bet?"
     b <- getLineCorr
     if isDouble b 
@@ -175,10 +175,10 @@ placeBet (State currentCard nextCard savedChoice playerFunds bet deck mult winni
                     then do 
                     putStrLn "You have to bet more than $0." 
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck mult winnings)
-            else if playerBet <= playerFunds 
+            else if playerBet <= fromIntegral(chipsToMoney playerFunds)
                 then do
-                    putStrLn $ "You now have $" ++ strRound(show (playerFunds - playerBet)) ++ "\n"
-                    return (State currentCard nextCard savedChoice (playerFunds - playerBet) playerBet deck mult winnings) 
+                    putStrLn $ "You now have $" ++ strRound(show (chipsToMoney (subChips (round playerBet) playerFunds))) ++ "\n"
+                    return (State currentCard nextCard savedChoice (subChips (round playerBet) playerFunds) playerBet deck mult winnings) 
                 else do
                     putStrLn "You don't have enough money! Please try again." 
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck mult winnings)
@@ -216,7 +216,7 @@ main = do
     play initState
 
 --initial State with $1000 (arbitrary default amount of money)
-initState = State 0 0 "" 1000 0 [] 1 0
+initState = State 0 0 "" initChips 0 [] 1 0
 
 play :: State -> IO State
 play s = do
@@ -234,12 +234,14 @@ play s = do
             playersTurn b
     else if ans `elem` ["c","cash"]
         then do 
-            putStrLn "Use Display method"
+            putStrLn $ "CASHING IN: "
+            displayChips(moneyToChips (round (getWinnings s)))
             putStrLn ""
-            play (State 0 0 "" ((getFunds s) + (getWinnings s)) 0 [] 1 0)
+            play (State 0 0 "" (addChips (round (getWinnings s)) (getFunds s)) 0 [] 1 0)
     else if ans `elem` ["v", "view"]
         then do
-            putStrLn "use display method"
+            putStrLn $ "CURRENT FUNDS: " 
+            displayChips (getFunds s)
             putStrLn ""
             play s
     else if ans `elem` ["q","quit"]
@@ -273,7 +275,7 @@ getMult (State currentCard nextCard savedChoice playerfunds bet currDeck mult wi
 getWinnings (State currentCard nextCard savedChoice playerfunds bet currDeck mult winnings) = winnings
 
 -- show playerfunds
-getFunds :: State -> Double
+-- getFunds :: State -> Double
 getFunds (State currentCard nextCard savedChoice playerfunds bet currDeck mult winnings) = playerfunds
 
 -- round string to 2 decimals
@@ -288,7 +290,7 @@ result (EndOfGame 0 s w) = do
     putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------TIE-------------" ++ "\n"
-    putStrLn $ "Player Funds: " ++ strRound(show (getFunds s)) ++ "\n"
+    putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
     putStrLn $ "Winnings Summary:"
     putStrLn $ "    = Multiplier x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
@@ -300,7 +302,7 @@ result (EndOfGame 1 s w) = do
     putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------LOSE-------------" ++ "\n"
-    putStrLn $ "Player Funds: " ++ strRound(show (getFunds s)) ++ ""
+    putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ ""
     putStrLn $ "You LOST:"
     putStrLn $ "- Your Bet: $" ++ strRound(show (getBet s)) ++ ""
     putStrLn $ "- Your Winnings: $" ++ strRound(show (w)) ++ "\n"
@@ -311,7 +313,7 @@ result (EndOfGame 2 s w) = do
     putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------WIN-------------" ++ "\n"
-    putStrLn $ "Player Funds: " ++ strRound(show (getFunds s)) ++ "\n"
+    putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
     putStrLn $ "Winnings Summary:"
     putStrLn $ "    = Multiplier x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
