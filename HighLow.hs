@@ -85,30 +85,30 @@ createDeck = unsafePerformIO (shuffle decks)
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
-    p <- placeBet p
+    nextP <- placeBet p
    -- playerBet <- toDouble playerBet
-    putStrLn $ "Your Card: " ++ show (getCurrentCard p) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (getCurrentCard nextP) ++ "\n"
     putStrLn "High or Low?"
     ans <- getLineCorr
     if ans `elem` ["high", "High"] 
         then do
-            result (highlow p "High")
-            play p
+            result (highlow nextP "High")
+            play nextP
     else if ans `elem` ["low", "Low"] 
         then do
-            result(highlow p "Low")
-            play p
+            result(highlow nextP "Low")
+            play nextP
     else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'High' or 'Low'"
-            playersTurn p
+            playersTurn nextP
 
 
 
 -- gets the users bet
 placeBet :: State -> IO State
 placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
-    putStrLn $ "You have $" ++ show (getFunds (State currentCard nextCard savedChoice playerFunds bet deck)) ++ "\n"
+    putStrLn $ "You have $" ++ show playerFunds ++ "\n"
     putStrLn "How much would you like to bet?"
     --betPrompt (State currentCard nextCard savedChoice playerFunds bet deck)
     b <- getLineCorr
@@ -121,7 +121,7 @@ placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
             else if playerBet <= playerFunds 
                 then do
-                    return (State currentCard nextCard savedChoice (playerFunds-playerBet) playerBet deck) 
+                    return (State currentCard nextCard savedChoice playerFunds playerBet deck) 
                 else do
                     putStrLn "You don't have enough money! Please try again." 
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
@@ -129,30 +129,12 @@ placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
             putStrLn "Invalid input. Please try again."
             placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
 
-{-
---prints bet prompt
---betPrompt :: State -> IO State
-betPrompt (State currentCard nextCard savedChoice playerFunds bet deck) = do
-    putStrLn $ "You have $" ++ show playerFunds 
-    ++ "remaining \nHow much would you like to bet?"  
--}
-
 -- determines if a string is a double
 -- taken from https://rosettacode.org/wiki/Determine_if_a_string_is_numeric#Haskell
 isDouble s = case reads s :: [(Double, String)] of
   [(_, "")] -> True
   _         -> False
 
-{-
---converts a string to a double
-toDouble [] = 0.0
-toDouble s = do
-    read s :: Double 
-
---converts a double to a string
-toString d = do
-    show d :: String
--}
 -- Randomly shuffles deck of cards
 -- -- algorithm for shuffle taken from https://wiki.haskell.org/Random_shuffle
 -- -- | Randomly shuffle a list
@@ -206,6 +188,7 @@ getNextCard (State currentCard nextCard savedChoice playerfunds bet currDeck) = 
 getChoice (State currentCard nextCard savedChoice playerfunds bet currDeck) = savedChoice
 
 -- show playerfunds
+getFunds :: State -> Double
 getFunds (State currentCard nextCard savedChoice playerfunds bet currDeck) = playerfunds
 
 result :: Result -> IO State
