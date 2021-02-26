@@ -49,7 +49,7 @@ highlow :: State -> String -> Result
 highlow (State currentCard nextCard savedChoice playerfunds bet currDeck) choice
     | tie currentCard nextCard choice = EndOfGame 0 (State currentCard nextCard choice (playerfunds + bet) 0 currDeck)
     | lose currentCard nextCard choice = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
-    | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) 0 currDeck)
+    | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) bet currDeck)
     | otherwise = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
 
 -- tie if currentCard and nextCard are equal
@@ -85,32 +85,27 @@ createDeck = unsafePerformIO (shuffle decks)
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
-    nextP <- placeBet p
-   -- playerBet <- toDouble playerBet
-    putStrLn $ "Your Card: " ++ show (getCurrentCard nextP) ++ "\n"
+    putStrLn $ "Your Card: " ++ show (getCurrentCard p) ++ "\n"
     putStrLn "High or Low?"
     ans <- getLineCorr
     if ans `elem` ["high", "High"] 
         then do
-            result (highlow nextP "High")
+            nextP <- result (highlow p "High")
             play nextP
     else if ans `elem` ["low", "Low"] 
         then do
-            result(highlow nextP "Low")
+            nextP <- result (highlow p "Low")
             play nextP
     else do
             putStrLn "Invalid input. Please try again."
             putStrLn "Enter 'High' or 'Low'"
-            playersTurn nextP
-
-
+            playersTurn p
 
 -- gets the users bet
 placeBet :: State -> IO State
 placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
     putStrLn $ "You have $" ++ show playerFunds ++ "\n"
     putStrLn "How much would you like to bet?"
-    --betPrompt (State currentCard nextCard savedChoice playerFunds bet deck)
     b <- getLineCorr
     if isDouble b 
         then do
@@ -121,7 +116,7 @@ placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
             else if playerBet <= playerFunds 
                 then do
-                    return (State currentCard nextCard savedChoice playerFunds playerBet deck) 
+                    return (State currentCard nextCard savedChoice (playerFunds - playerBet) playerBet deck) 
                 else do
                     putStrLn "You don't have enough money! Please try again." 
                     placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
@@ -168,7 +163,8 @@ play s = do
     if ans `elem` ["y", "yes"] 
         then do 
             a <- drawCard s
-            playersTurn a
+            b <- placeBet a
+            playersTurn b
     else if ans `elem` ["n","no"]
         then do 
             putStrLn "Thank you for visiting."
@@ -186,6 +182,12 @@ getNextCard (State currentCard nextCard savedChoice playerfunds bet currDeck) = 
 
 -- show choice
 getChoice (State currentCard nextCard savedChoice playerfunds bet currDeck) = savedChoice
+
+-- show bet
+getBet (State currentCard nextCard savedChoice playerfunds bet currDeck) = bet 
+
+-- show deck
+getDeck (State currentCard nextCard savedChoice playerfunds bet currDeck) = currDeck
 
 -- show playerfunds
 getFunds :: State -> Double
