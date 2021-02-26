@@ -72,7 +72,7 @@ highlow :: State -> String -> Result
 highlow (State currentCard nextCard savedChoice playerfunds bet currDeck) choice
     | tie currentCard nextCard choice = EndOfGame 0 (State currentCard nextCard choice (playerfunds + bet) 0 currDeck)
     | lose currentCard nextCard choice = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
-    | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + 1.5*bet) bet currDeck)
+    | win currentCard nextCard choice = EndOfGame 2 (State currentCard nextCard choice (playerfunds + (m currentCard choice)*bet) bet currDeck)
     | otherwise = EndOfGame 1 (State currentCard nextCard choice playerfunds 0 currDeck)
 
 -- tie if currentCard and nextCard are equal
@@ -94,6 +94,39 @@ win currentCard nextCard choice
     | choice == "Low" = (cardValue currentCard) > (cardValue nextCard)
     | choice == "High" = (cardValue currentCard) < (cardValue nextCard)
     | otherwise = False
+
+-- if the player correctly guessed, give the multiplier based on their guess and the previous card
+m prevCard playerGuess 
+    | prevCard == 1 && playerGuess == "High" || prevCard == 13 && playerGuess == "Low" 
+        = 1.2
+    | prevCard == 2 && playerGuess == "High" || prevCard == 12 && playerGuess == "Low" 
+        = 1.3
+    | prevCard == 3 && playerGuess == "High" || prevCard == 11 && playerGuess == "Low" 
+        = 1.35
+    | prevCard == 4 && playerGuess == "High" || prevCard == 10 && playerGuess == "Low" 
+        = 1.4
+    | prevCard == 5 && playerGuess == "High" || prevCard == 9 && playerGuess == "Low" 
+        = 1.425
+    | prevCard == 6 && playerGuess == "High" || prevCard == 8 && playerGuess == "Low" 
+        = 1.45
+    | prevCard == 7 && playerGuess == "High" || prevCard == 7 && playerGuess == "Low" 
+        = 1.5
+    | prevCard == 8 && playerGuess == "High" || prevCard == 6 && playerGuess == "Low" 
+        = 1.625
+    | prevCard == 9 && playerGuess == "High" || prevCard == 5 && playerGuess == "Low" 
+        = 1.75
+    | prevCard == 10 && playerGuess == "High" || prevCard == 4 && playerGuess == "Low" 
+        = 2.0
+    | prevCard == 11 && playerGuess == "High" || prevCard == 3 && playerGuess == "Low" 
+        = 2.25
+    | prevCard == 12 && playerGuess == "High" || prevCard == 2 && playerGuess == "Low" 
+        = 2.5
+    | prevCard == 13 && playerGuess == "High" || prevCard == 1 && playerGuess == "Low" 
+        = 3.0
+    | otherwise = 1.5
+    
+    
+
 
 -- draw card to keep track of current card and perhaps nextCard??
 drawCard :: State -> IO State
