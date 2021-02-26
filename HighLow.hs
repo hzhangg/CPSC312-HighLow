@@ -9,6 +9,8 @@ import System.IO.Unsafe
    Then continue as normal
 -}
 
+-- To run the game do: main
+
 -- Taken from the TwentyOneQuestion assignment solution
 -- getLineCorr reads the line and returns the corrected line by removing deleted characters
 getLineCorr :: IO [Char]
