@@ -85,6 +85,8 @@ createDeck = unsafePerformIO (shuffle decks)
 -- playersTurn
 playersTurn :: State -> IO State
 playersTurn p = do
+    p <- placeBet p
+   -- playerBet <- toDouble playerBet
     putStrLn $ "Your Card: " ++ show (getCurrentCard p) ++ "\n"
     putStrLn "High or Low?"
     ans <- getLineCorr
@@ -102,6 +104,55 @@ playersTurn p = do
             playersTurn p
 
 
+
+-- gets the users bet
+placeBet :: State -> IO State
+placeBet (State currentCard nextCard savedChoice playerFunds bet deck) = do
+    putStrLn $ "You have $" ++ show (getFunds (State currentCard nextCard savedChoice playerFunds bet deck)) ++ "\n"
+    putStrLn "How much would you like to bet?"
+    --betPrompt (State currentCard nextCard savedChoice playerFunds bet deck)
+    b <- getLineCorr
+    if isDouble b 
+        then do
+            let playerBet = read b :: Double
+            if playerBet <= 0
+                    then do 
+                    putStrLn "You have to bet more than $0." 
+                    placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
+            else if playerBet <= playerFunds 
+                then do
+                    return (State currentCard nextCard savedChoice (playerFunds-playerBet) playerBet deck) 
+                else do
+                    putStrLn "You don't have enough money! Please try again." 
+                    placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
+        else do
+            putStrLn "Invalid input. Please try again."
+            placeBet (State currentCard nextCard savedChoice playerFunds 0 deck)
+
+{-
+--prints bet prompt
+--betPrompt :: State -> IO State
+betPrompt (State currentCard nextCard savedChoice playerFunds bet deck) = do
+    putStrLn $ "You have $" ++ show playerFunds 
+    ++ "remaining \nHow much would you like to bet?"  
+-}
+
+-- determines if a string is a double
+-- taken from https://rosettacode.org/wiki/Determine_if_a_string_is_numeric#Haskell
+isDouble s = case reads s :: [(Double, String)] of
+  [(_, "")] -> True
+  _         -> False
+
+{-
+--converts a string to a double
+toDouble [] = 0.0
+toDouble s = do
+    read s :: Double 
+
+--converts a double to a string
+toString d = do
+    show d :: String
+-}
 -- Randomly shuffles deck of cards
 -- -- algorithm for shuffle taken from https://wiki.haskell.org/Random_shuffle
 -- -- | Randomly shuffle a list
@@ -120,7 +171,6 @@ shuffle xs = do
       n = length xs
       newArray :: Int -> [a] -> IO (IOArray Int a)
       newArray n xs =  newListArray (1,n) xs
-
 
 -- to run program: main
 main = do
