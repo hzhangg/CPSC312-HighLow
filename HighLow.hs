@@ -213,6 +213,18 @@ shuffle xs = do
 
 -- to run program: main
 main = do
+    putStrLn ""
+    putStrLn $ "=============================================================================================="
+    putStrLn $ " $$$$$$\\   $$$$$$\\   $$$$$$\\  $$$$$$\\ $$\\   $$\\  $$$$$$\\         $$$$$$\\    $$\\    $$$$$$\\  "
+    putStrLn $ "$$  __$$\\ $$  __$$\\ $$  __$$\\ \\_$$  _|$$$\\  $$ |$$  __$$\\       $$ ___$$\\ $$$$ |  $$  __$$\\ "
+    putStrLn $ "$$ /  \\__|$$ /  $$ |$$ /  \\__|  $$ |  $$$$\\ $$ |$$ /  $$ |      \\_/   $$ |\\_$$ |  \\__/  $$ |"
+    putStrLn $ "$$ |      $$$$$$$$ |\\$$$$$$\\    $$ |  $$ $$\\$$ |$$ |  $$ |        $$$$$ /   $$ |   $$$$$$  |"
+    putStrLn $ "$$ |      $$  __$$ | \\____$$\\   $$ |  $$ \\$$$$ |$$ |  $$ |        \\___$$\\   $$ |  $$  ____/" 
+    putStrLn $ "$$ |  $$\\ $$ |  $$ |$$\\   $$ |  $$ |  $$ |\\$$$ |$$ |  $$ |      $$\\   $$ |  $$ |  $$ |      "
+    putStrLn $ "\\$$$$$$  |$$ |  $$ |\\$$$$$$  |$$$$$$\\ $$ | \\$$ | $$$$$$  |      \\$$$$$$  |$$$$$$\\ $$$$$$$$\\" 
+    putStrLn $ " \\______/ \\__|  \\__| \\______/ \\______|\\__|  \\__| \\______/        \\______/ \\______|\\________|"
+    putStrLn $ "=============================================================================================="
+    putStrLn ""
     play initState
 
 --initial State with $1000 (arbitrary default amount of money)
@@ -227,7 +239,13 @@ play s = do
     putStrLn "- Quit App?     (q/quit)"
     ans <- getLineCorr
     putStrLn ""
-    if ans `elem` ["p", "play"] 
+    if (ans `elem` ["p", "play"]) && ((chipsToMoney (getFunds s)) <= 0 )
+        then do
+            putStrLn $ "=================================="
+            putStrLn $ "Looks like you're broke. GET OUT!!"
+            putStrLn $ "================================== \n"
+            play s
+    else if ans `elem` ["p", "play"] 
         then do 
             a <- drawCard s
             b <- placeBet a
@@ -246,7 +264,16 @@ play s = do
             play s
     else if ans `elem` ["q","quit"]
         then do 
-            putStrLn $ "Thank you for visiting. \n"
+            putStrLn $ "THANKS FOR VISITING!!"
+            putStrLn $ "============================================================================="
+            putStrLn $ ".------..------..------..------.     .------..------..------..------..------."
+            putStrLn $ "|C.--. ||O.--. ||M.--. ||E.--. |.-.  |A.--. ||G.--. ||A.--. ||I.--. ||N.--. |"
+            putStrLn $ "| :/\\: || :/\\: || (\\/) || (\\/) ((5)) | (\\/) || :/\\: || (\\/) || (\\/) || :(): |"
+            putStrLn $ "| :\\/: || :\\/: || :\\/: || :\\/: |'-.-.| :\\/: || :\\/: || :\\/: || :\\/: || ()() |"
+            putStrLn $ "| '--'C|| '--'O|| '--'M|| '--'E| ((1)) '--'A|| '--'G|| '--'A|| '--'I|| '--'N|"
+            putStrLn $ "`------'`------'`------'`------'  '-'`------'`------'`------'`------'`------'"
+            putStrLn $ "============================================================================="
+            putStrLn ""
             return s
         else do
             putStrLn "Invalid input. Please try again."
@@ -291,10 +318,11 @@ result (EndOfGame 0 s w) = do
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------TIE-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
-    putStrLn $ "Winnings Summary:"
+    putStrLn $ "TIE SUMMARY:"
     putStrLn $ "    = Multiplier x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
     putStrLn $ "    = $" ++ strRound (show (getWinnings s)) ++ "\n"
+    putStrLn $ "-------------TIE-------------" ++ "\n"
     return s
 result (EndOfGame 1 s w) = do
     putStrLn ""
@@ -302,10 +330,11 @@ result (EndOfGame 1 s w) = do
     putStrLn $ "Next Card: " ++ show (toCard (getNextCard s)) ++ "\n"
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------LOSE-------------" ++ "\n"
-    putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ ""
-    putStrLn $ "You LOST:"
-    putStrLn $ "- Your Bet: $" ++ strRound(show (getBet s)) ++ ""
-    putStrLn $ "- Your Winnings: $" ++ strRound(show (w)) ++ "\n"
+    putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
+    putStrLn $ "LOSE SUMMARY:"
+    putStrLn $ "- Lost Bet: $" ++ strRound(show (getBet s)) ++ ""
+    putStrLn $ "- Lost Winnings: $" ++ strRound(show (w)) ++ "\n"
+    putStrLn $ "-------------LOSE-------------" ++ "\n"
     return s
 result (EndOfGame 2 s w) = do
     putStrLn ""
@@ -314,8 +343,9 @@ result (EndOfGame 2 s w) = do
     putStrLn $ "Your Choice: " ++ show (getChoice s) ++ "\n"
     putStrLn $ "-------------WIN-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
-    putStrLn $ "Winnings Summary:"
+    putStrLn $ "WIN SUMMARY:"
     putStrLn $ "    = Multiplier x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
     putStrLn $ "    = $" ++ strRound (show (getWinnings s)) ++ "\n"
+    putStrLn $ "-------------WIN-------------" ++ "\n"
     return s
