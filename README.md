@@ -22,6 +22,7 @@ Our variation has the following features:
 **Dynamic Payout System**
 The Payout dynamically changes proportional to the odds of a guess being correct.
 - This is given in the form of a multiplier to your payout
+
 For instance, 
 	Guessing "High" when given an Ace(#1) has ~90% to be correct -> Low  Multipler (x1.2)
 	Guessing "Low " when given an Ace(#1) has ~10% to be correct -> High Multipler (x3.0)
@@ -33,10 +34,10 @@ With each consequtive win, you are given a multiplier to your Payout.
 - Losing will reset the multipler to 1.0 and discard all stacked multipliers
 
 For instance,
-	Assume we always draw an Ace(#1) and guess "High", so multipler is (x1.2)
-		Win #1: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)             = 1.20
-		Win #2: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)x(1.2)       = 1.44
-		Win #2: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)x(1.2)x(1.2) = 1.73	
+- Assume we always draw an Ace(#1) and guess "High", so multipler is (x1.2)
+- Win #1: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)             = 1.20
+- Win #2: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)x(1.2)       = 1.44
+- Win #2: Multiplier Gained = x1.2, Total Multipler = (1.0)x(1.2)x(1.2)x(1.2) = 1.73	
 
 
 **Compounded Betting System**
@@ -53,14 +54,14 @@ Upon Losing
 Upon Continuing Streak
 - At this point, you may also bet even more money to contribute to you winnings
 - Specifically, your winnings are calculated based on your Multiplier, PayoutSoFar, and Bet 
---> Multiplier x (PayoutSoFar + Bet)
 - The implications is that your payout will follow a compounded pattern 
 
 For instance,
-	Assume in each win session, Multiplier gained is 1.2, Bet was $100
-		Win #1: 1.20 x (0 + $100)    = $120.00
-		Win #2: 1.44 x ($120 + $100) = $316.80
-		Win #3: 1.73 x ($317 + $100) = $721.41
+- Assume in each win session, Multiplier gained is 1.2, Bet was $100
+- Multiplier   x (PayoutSoFar + Bet)
+- Win #1: 1.20 x (0 + $100)    = $120.00
+- Win #2: 1.44 x ($120 + $100) = $316.80
+- Win #3: 1.73 x ($317 + $100) = $721.41
 
 ** Chip System **
 We built a representation of the Player's Funds and Payout as Money Chips as in real casinos 
@@ -79,10 +80,10 @@ We implemented the BFS algorithm along with memoization to compute the Chips dea
 - This function minimizes the amount of Chips needed to satisfy the amount
 
 For instance,
-	$40 with a greedy algorithm (translate highest cost chips first)
-		Has the chips [25, 10 ,5] = 3 Chips
-	$40 with our algorithm minimizes the chips needed 
-		Has the chips [20, 20]    = 2 Chips
+- $40 with a greedy algorithm (translate highest cost chips first)
+- Has the chips [25, 10 ,5] = 3 Chips
+- $40 with our algorithm minimizes the chips needed 
+- Has the chips [20, 20]    = 2 Chips
 
 
 ** Card System **
