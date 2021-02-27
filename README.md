@@ -1,5 +1,6 @@
 # CPSC312-HighLow
 This repository is for our HighLow project for CPSC312
+
 Wiki Link: https://wiki.ubc.ca/Course:CPSC312-2021/HighLow
 
 To try our app, run the "main" function found in HighLow.hs
@@ -9,26 +10,30 @@ To try our app, run the "main" function found in HighLow.hs
    main
    
 << Note>>
+
 If the random import gives you issues when compiling, try (on a new terminal):
-    stack import random
-    stack ghci
+1. stack import random
+2. stack ghci
 
 
 << Description >>
+
 HighLow is a card game where the Player attempts to guess if the next card drawn is "Higher" or "Lower" than the previous.
 Our variation has the following features:
 
 
 **Dynamic Payout System**
+
 The Payout dynamically changes proportional to the odds of a guess being correct.
 - This is given in the form of a multiplier to your payout
 
 For instance, 
-	Guessing "High" when given an Ace(#1) has ~90% to be correct -> Low  Multipler (x1.2)
-	Guessing "Low " when given an Ace(#1) has ~10% to be correct -> High Multipler (x3.0)
+- Guessing "High" when given an Ace(#1) has ~90% to be correct -> Low  Multipler (x1.2)
+- Guessing "Low " when given an Ace(#1) has ~10% to be correct -> High Multipler (x3.0)
 
 
 **Win-Streak System**
+
 With each consequtive win, you are given a multiplier to your Payout.
 - This multiplier stacks with previous multipliers gained.
 - Losing will reset the multipler to 1.0 and discard all stacked multipliers
@@ -41,6 +46,7 @@ For instance,
 
 
 **Compounded Betting System**
+
 The player may bet any non-negative amount of money that they possess.
 
 Upon Victory
@@ -64,6 +70,7 @@ For instance,
 - Win #3: 1.73 x ($317 + $100) = $721.41
 
 ** Chip System **
+
 We built a representation of the Player's Funds and Payout as Money Chips as in real casinos 
 
 Sample Values:
@@ -87,6 +94,7 @@ For instance,
 
 
 ** Card System **
+
 We implemented a representation of the 13 unique cards in a deck
 - We used a randomization algorithm to create and shuffle the deck 
 - The drawn card is random
@@ -98,7 +106,9 @@ Also:
 - If the deck runs out, the deck is reset
 
 **Input Cleaning and Simple TextUI**
+
 We implemented some input processing.
+
 We played with text formatting and printing for decorative and readability purposes
 
 
