@@ -5,7 +5,7 @@ module Funds where
 -- ======================== --
 
 -- [Chips] 
--- represents the player's chips
+-- represents the player's chips/money
 playerChips w r o y g b p m = [(Whites w), (Reds r), (Oranges o), (Yellows y), (Greens g), (Blacks b), (Purples p), (Maroons m)]
 
 emptyChips = playerChips 0 0 0 0 0 0 0 0
