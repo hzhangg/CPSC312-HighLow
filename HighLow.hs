@@ -9,16 +9,16 @@ import Funds
 
 {- 
 
-<< Note>>
-If the random import gives you issues when compiling, try (on a new terminal):
-    stack import random
-    stack ghci
-
 1. Load the module
    :load HighLow
 2. To run the game do:
    main
    
+<< Note>>
+If the random import gives you issues when compiling, try (on a new terminal):
+    stack import random
+    stack ghci
+
 -}
 
 
@@ -367,7 +367,7 @@ printResult (EndOfGame 0 s w) = do
     putStrLn $ "-------------TIE-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
     putStrLn $ "TIE SUMMARY:"
-    putStrLn $ "    = SteakBonus x (PastWinnings + Bet)"
+    putStrLn $ "    = StreakBonus x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
     putStrLn $ "    = $" ++ strRound (show (getWinnings s)) ++ "\n"
     putStrLn $ "-------------TIE-------------" ++ "\n"
@@ -392,7 +392,7 @@ printResult (EndOfGame 2 s w) = do
     putStrLn $ "-------------WIN-------------" ++ "\n"
     putStrLn $ "Player Funds: " ++ strRound(show (chipsToMoney (getFunds s))) ++ "\n"
     putStrLn $ "WIN SUMMARY:"
-    putStrLn $ "    = SteakBonus x (PastWinnings + Bet)"
+    putStrLn $ "    = StreakBonus x (PastWinnings + Bet)"
     putStrLn $ "    = " ++ strRound (show (getMult s)) ++ " x ("  ++ strRound(show (w)) ++ " + "  ++ strRound(show (getBet s)) ++ ")"
     putStrLn $ "    = $" ++ strRound (show (getWinnings s)) ++ "\n"
     putStrLn $ "-------------WIN-------------" ++ "\n"
