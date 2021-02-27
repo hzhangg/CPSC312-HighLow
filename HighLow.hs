@@ -64,7 +64,7 @@ play s = do
             putStrLn $ "CASHING IN: "
             displayChips(moneyToChips (round (getWinnings s)))
             putStrLn ""
-            play (State 0 0 "" (addChips (round (getWinnings s)) (getFunds s)) 0 [] 1 0)
+            play (State 0 0 "" (addChips (round (getWinnings s)) (getFunds s)) 0 (getDeck s) 1 0)
     else if ans `elem` ["v", "view"]
         then do
             putStrLn $ "CURRENT FUNDS: " 
@@ -92,7 +92,6 @@ drawCard (State currentCard nextCard savedChoice playerFunds bet [] mult winning
 drawCard (State currentCard nextCard savedChoice playerFunds bet (f:r) mult winnings) 
     | nextCard == 0 = drawCard (State currentCard f savedChoice playerFunds bet r mult winnings)
     | otherwise = return (State nextCard f savedChoice playerFunds bet r mult winnings)
-
 
 -- [Step #2 ]
 -- gets the users bet that they inputted
@@ -146,7 +145,7 @@ playersTurn p = do
 -- =============== --
 
 --initial State with $5000 in chips (arbitrary default amount of money)
-initState = State 0 0 "" initChips 0 [] 1 0
+initState = State 0 0 "" initChips 0 createDeck 1 0
 
 
 -- a state is a state where currentCard nextCard savedChoice playerfunds bet [remaining cards in deck] multiplier winnings
@@ -206,11 +205,11 @@ cardValue n
 -- matches the numeric value of a card to its name
 toCard :: Int -> String
 toCard n 
-    | n == 1 = "Ace (aces are ones!)" -- ++ randomSuit (mkStdGen 100)
-    | n == 11 = "Jack" -- ++ randomSuit (mkStdGen 100)
-    | n == 12 = "Queen" -- ++ randomSuit (mkStdGen 100)
-    | n == 13 = "King" -- ++ randomSuit (mkStdGen 100)
-    | otherwise = show n -- ++ randomSuit (mkStdGen 100)
+    | n == 1 = "Ace (aces are ones!)" 
+    | n == 11 = "Jack" 
+    | n == 12 = "Queen" 
+    | n == 13 = "King"
+    | otherwise = show n 
 
 
 -- Randomly shuffles deck of cards
