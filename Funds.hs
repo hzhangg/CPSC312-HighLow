@@ -1,4 +1,3 @@
-
 module Funds where
 
 -- ======================== --
@@ -38,6 +37,25 @@ willBankrupt cost chips =
     let budget = chipsToMoney chips
     in (budget - cost) < 0
 
+-- [Chips] -> Int
+-- sums up the playerChips to get total value/budget
+chipsToMoney chips = sum (map chipVal chips)
+
+-- Int -> [Chips] 
+-- converts a specified amount of money into Chips 
+moneyToChips n = 
+    let change = mem_toChange n
+    in (playerChips
+         (length (filter isWhite change))
+         (length (filter isRed change))
+         (length (filter isOrange change))
+         (length (filter isYellow change))
+         (length (filter isGreen change))
+         (length (filter isBlack change))
+         (length (filter isPurple change))
+         (length (filter isMaroon change))
+        )
+
 -- [Chips] -> consoleUI
 -- prints the currently held chips on console
 displayChips chips = 
@@ -64,10 +82,6 @@ displayChips chips =
         putStrLn $ "(Maroons) " ++ show (m) ++ " chips = $" ++ show (maroon) ++ " x " ++ show (m) ++ " = $" ++ show (m * maroon) ++" "
         putStrLn $ "_________________________________________________"
         putStrLn $ "<< Total >> = $" ++ show (chipsToMoney chips) ++ " "
-
--- [Chips] -> Int
--- sums up the playerChips to get total value/budget
-chipsToMoney chips = sum (map chipVal chips)
 
 
 -- ============ --
@@ -111,21 +125,6 @@ isGreen n = n == green
 isBlack n = n == black
 isPurple n = n == purple
 isMaroon n = n == maroon
-
--- Int -> [Chips] 
--- converts a specified amount of money into Chips 
-moneyToChips n = 
-    let change = mem_toChange n
-    in (playerChips
-         (length (filter isWhite change))
-         (length (filter isRed change))
-         (length (filter isOrange change))
-         (length (filter isYellow change))
-         (length (filter isGreen change))
-         (length (filter isBlack change))
-         (length (filter isPurple change))
-         (length (filter isMaroon change))
-        )
 
 -- (Int -> Int -> Int) -> [Chips] -> [Chips] -> [Chips]
 -- abstracted chip modification function 
@@ -172,9 +171,10 @@ mem_toChange n = mem_list !! n
 
 
 -- (Int -> [Int]) -> Int -> [Int]
+-- a breadth-first search utilizing memoization
+-- will minimize number of coins required
 -- returns a list of coins used as change for n
--- a breadth-first search utilizing memoization 
--- Test (mem_toChange 40) to prove it works
+-- Ex. 40 -> [20, 20] and not [25,10,5]
 toChange mf n =
     if n < white then []
     else if n < red then bestof [
