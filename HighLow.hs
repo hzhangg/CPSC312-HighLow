@@ -400,6 +400,8 @@ printResult (EndOfGame 2 s w) = do
 
 
 -- Prints the welcome text at start of application
+-- Used an ASCII Art generator
+-- Note backslashes need to be doubled as they are escape characters
 printCasino :: IO ()
 printCasino = do
     putStrLn ""
@@ -425,6 +427,8 @@ printBroke = do
 
 
 -- Prints the goodbye text during quiting of application
+-- Used an ASCII Art generator
+-- Note backslashes need to be doubled as they are escape characters
 printGoodbye :: IO ()
 printGoodbye = do
     putStrLn $ "THANKS FOR VISITING!!"

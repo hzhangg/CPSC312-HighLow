@@ -164,6 +164,7 @@ checkChips f
 
 -- [[Int]]
 -- The memoization data structure (an array)
+-- Used the top answer's for guidence https://stackoverflow.com/questions/3208258/memoization-in-haskell
 mem_list = map (toChange mem_toChange) [0..]
 -- Int -> [Int]
 -- The getter function
