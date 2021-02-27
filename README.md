@@ -69,7 +69,7 @@ For instance,
 - Win #2: 1.44 x ($120 + $100) = $316.80
 - Win #3: 1.73 x ($317 + $100) = $721.41
 
-** Chip System **
+**Chip System**
 
 We built a representation of the Player's Funds and Payout as Money Chips as in real casinos 
 
@@ -93,7 +93,7 @@ For instance,
 - Has the chips [20, 20]    = 2 Chips
 
 
-** Card System **
+**Card System**
 
 We implemented a representation of the 13 unique cards in a deck
 - We used a randomization algorithm to create and shuffle the deck 
